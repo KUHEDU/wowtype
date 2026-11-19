@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>WOW Together 티저</title>
+<meta name="robots" content="noindex,nofollow">
+<meta name="description" content="우리가 함께 일하는 방식이, 곧 찾아옵니다! 영상 보고 나의 WOW 타입도 알아보세요">
+<meta property="og:type" content="website">
+<meta property="og:title" content="WOW Together — 곧 찾아옵니다!">
+<meta property="og:description" content="35초 티저 보고, 나는 어떤 WOW 타입인지 알아보세요">
+<meta property="og:image" content="https://kuhedu.github.io/wowtype/teaser/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://kuhedu.github.io/wowtype/teaser/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#eef0f4">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+:root{
+  --bg:#eef0f4; --ink:#16181d; --sub:#5b6170; --line:#dfe2e8;
+  --accent:#f25a2b;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  background:radial-gradient(120% 80% at 50% 0%,#f7f8fa 0%,var(--bg) 60%,#e7e9ef 100%);
+  color:var(--ink);
+  font-family:'Pretendard Variable',Pretendard,system-ui,-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;
+  -webkit-font-smoothing:antialiased;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  min-height:100dvh;padding:24px 16px calc(24px + env(safe-area-inset-bottom));
+}
+.wrap{width:100%;max-width:1040px}
+.eyebrow{font-size:13px;font-weight:700;letter-spacing:.12em;color:var(--sub);text-transform:uppercase;margin:0 0 12px 2px}
+.stage{
+  position:relative;width:100%;aspect-ratio:16/9;border-radius:18px;overflow:hidden;
+  background:#e9ebf0 url(poster.jpg) center/cover no-repeat;
+  box-shadow:0 1px 0 rgba(255,255,255,.8) inset,0 20px 50px -24px rgba(22,24,29,.35);
+}
+video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:transparent;display:block}
+/* 시작 버튼 */
+.play{
+  position:absolute;inset:0;display:flex;align-items:flex-end;justify-content:flex-end;padding:clamp(10px,2.2%,22px);
+  background:transparent;border:0;cursor:pointer;transition:opacity .3s;
+}
+.play i{display:flex;align-items:center;justify-content:center;width:clamp(40px,6vw,60px);height:clamp(40px,6vw,60px);
+  border-radius:50%;background:var(--ink);color:#fff;box-shadow:0 10px 24px -8px rgba(22,24,29,.55);transition:transform .2s}
+.play i svg{width:42%;height:42%;margin-left:8%}
+.play:hover i{transform:scale(1.08)}
+.start{
+  display:flex;align-items:center;gap:12px;
+  background:var(--ink);color:#fff;font:inherit;font-weight:700;font-size:clamp(16px,2.2vw,20px);
+  padding:clamp(12px,1.6vw,16px) clamp(22px,2.6vw,30px) clamp(12px,1.6vw,16px) clamp(18px,2.2vw,24px);
+  border-radius:999px;box-shadow:0 12px 30px -10px rgba(22,24,29,.6);
+  transition:transform .2s;
+}
+.start{border:0;cursor:pointer}
+.start:hover{transform:scale(1.04)}
+.start svg{width:1.1em;height:1.1em}
+.started .start,.started .skip{display:none}
+.stage.started .play{opacity:0;pointer-events:none}
+/* 영상 속 '지금 테스트하기' 자리에 겹치는 진짜 버튼 */
+.hot{
+  position:absolute;left:7.6%;top:71.7%;width:29.4%;height:10.8%;
+  border-radius:999px;display:none;cursor:pointer;
+  animation:ring 1.6s ease-out infinite;
+}
+.stage.ended .hot{display:block}
+@keyframes ring{0%{box-shadow:0 0 0 0 rgba(242,90,43,.55)}100%{box-shadow:0 0 0 18px rgba(242,90,43,0)}}
+/* 아래 버튼 줄 */
+.bar{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:22px;min-height:64px;flex-wrap:wrap}
+.go{
+  display:inline-flex;align-items:center;gap:10px;text-decoration:none;
+  background:var(--ink);color:#fff;font-weight:800;font-size:clamp(18px,2.4vw,22px);
+  padding:18px 34px;border-radius:999px;
+  box-shadow:0 14px 32px -12px rgba(22,24,29,.55);
+  opacity:0;transform:translateY(10px);pointer-events:none;
+  transition:opacity .45s ease,transform .45s cubic-bezier(.2,.8,.2,1);
+}
+.go>span{white-space:nowrap}
+.go b{color:#ffb39a;font-weight:800}
+.go svg{width:1em;height:1em;transition:transform .2s}
+.go:hover svg{transform:translateX(4px)}
+.bar:not(.ended-ui) .go{display:none}
+.ended-ui .go{opacity:1;transform:none;pointer-events:auto;animation:rise .45s cubic-bezier(.2,.8,.2,1) both,pulse 2.4s ease-in-out .6s infinite}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes pulse{0%,100%{box-shadow:0 14px 32px -12px rgba(22,24,29,.55)}50%{box-shadow:0 14px 32px -12px rgba(22,24,29,.55),0 0 0 8px rgba(242,90,43,.18)}}
+.again{
+  display:none;align-items:center;gap:6px;background:transparent;border:1px solid var(--line);
+  color:var(--sub);font:inherit;font-weight:600;font-size:15px;padding:14px 20px;border-radius:999px;cursor:pointer;
+}
+.again:hover{color:var(--ink);border-color:#c9ced8}
+.again svg{width:1em;height:1em}
+.ended-ui .again{display:inline-flex}
+.skip{font-size:14px;color:var(--sub);text-decoration:none;border-bottom:1px solid transparent}
+.skip:hover{color:var(--ink);border-color:currentColor}
+.ended-ui .skip{display:none}
+.bar{flex-direction:column}.bar .go{order:1}
+.ended-ui{flex-direction:row}.bar .again{order:2}
+.note{text-align:center;color:var(--sub);font-size:14px;margin-top:14px;min-height:20px}
+@media (max-width:560px){
+  .stage{border-radius:12px}
+  .go{width:100%;justify-content:center;padding:18px 20px}
+  .go .long{display:none}
+  .again{width:100%;justify-content:center}
+  .ended-ui{flex-direction:column}
+}
+@media (prefers-reduced-motion:reduce){.hot,.ended-ui .go{animation:none}}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <p class="eyebrow">WOW Together · Teaser</p>
+  <div class="stage" id="stage">
+    <video id="v" src="teaser.mp4" poster="poster.jpg" preload="metadata" playsinline webkit-playsinline></video>
+    <button class="play" id="play" aria-label="티저 영상 재생 (소리 켜짐)">
+      <i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12.5-7.5a1 1 0 0 0 0-1.72L8.5 3.64A1 1 0 0 0 7 4.5z"/></svg></i>
+    </button>
+    <a class="hot" id="hot" href="https://kuhedu.github.io/wowtype/" aria-label="WOW 타입 테스트 하기"></a>
+  </div>
+  <div class="bar" id="bar">
+    <button class="start" id="play2" type="button"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12.5-7.5a1 1 0 0 0 0-1.72L8.5 3.64A1 1 0 0 0 7 4.5z"/></svg>티저 보기 · 35초</button>
+    <a class="go" id="go" href="https://kuhedu.github.io/wowtype/"><span><span class="long">나는 어떤 </span><b>WOW</b> 타입 테스트 하기</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+    <button class="again" id="again" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>다시 보기</button>
+    <a class="skip" id="skip" href="https://kuhedu.github.io/wowtype/">영상 건너뛰고 바로 테스트 →</a>
+  </div>
+  <p class="note" id="note">🔊 소리를 켜고 봐 주세요</p>
+</main>
+<script>
+(function(){
+  var v=document.getElementById('v'), stage=document.getElementById('stage'),
+      bar=document.getElementById('bar'), note=document.getElementById('note');
+  function start(){
+    stage.classList.add('started'); bar.classList.add('started'); stage.classList.remove('ended'); bar.classList.remove('ended-ui');
+    v.controls=true; v.muted=false;
+    var p=v.play(); if(p&&p.catch) p.catch(function(){ v.muted=true; v.play(); note.textContent='소리가 꺼져 있으면 화면의 스피커 버튼을 눌러 주세요'; });
+  }
+  document.getElementById('play').addEventListener('click',start);
+  document.getElementById('play2').addEventListener('click',start);
+  document.getElementById('again').addEventListener('click',function(){ v.currentTime=0; start(); });
+  v.addEventListener('ended',function(){
+    // 전체화면에서 끝나면 빠져나와 버튼이 보이게
+    try{ if(document.fullscreenElement) document.exitFullscreen(); else if(document.webkitFullscreenElement) document.webkitExitFullscreen(); }catch(e){}
+    try{ if(v.webkitDisplayingFullscreen) v.webkitExitFullscreen(); }catch(e){}
+    v.controls=false;
+    stage.classList.add('ended'); bar.classList.add('ended-ui');
+    note.textContent='';
+    document.getElementById('go').focus({preventScroll:true});
+    var r=bar.getBoundingClientRect(); if(r.bottom>innerHeight) bar.scrollIntoView({behavior:'smooth',block:'center'});
+  });
+})();
+</script>
+</body>
+</html>
