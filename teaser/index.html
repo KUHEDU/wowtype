@@ -58,8 +58,28 @@ video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;backgr
 .start{border:0;cursor:pointer}
 .start:hover{transform:scale(1.04)}
 .start svg{width:1.1em;height:1.1em}
-.started .start,.started .skip{display:none}
-.stage.started .play{opacity:0;pointer-events:none}
+.started .start,.started .skip,.counting .start{display:none}
+.stage.started .play,.stage.counting .play{opacity:0;pointer-events:none}
+/* 3초 카운트다운 */
+.cd{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  background:rgba(238,240,244,.55);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);transition:opacity .35s;z-index:3;cursor:pointer}
+.cd.off{opacity:0;pointer-events:none}
+.cd .ring{position:relative;width:clamp(96px,16vw,150px);aspect-ratio:1}
+.cd svg{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg)}
+.cd circle{fill:none;stroke-width:6}
+.cd .bg{stroke:rgba(22,24,29,.12)}
+.cd .fg{stroke:var(--ink);stroke-linecap:round;stroke-dasharray:289;stroke-dashoffset:0;animation:sweep 3s linear forwards}
+@keyframes sweep{to{stroke-dashoffset:289}}
+.cd b{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:clamp(44px,7vw,72px);font-weight:800;color:var(--ink)}
+.cd b.pop{animation:pop .5s cubic-bezier(.2,.8,.2,1)}
+@keyframes pop{from{transform:scale(1.35);opacity:0}to{transform:none;opacity:1}}
+.cd small{position:absolute;left:0;right:0;bottom:clamp(12px,6%,36px);text-align:center;font-size:clamp(13px,1.6vw,16px);color:var(--sub);font-weight:600}
+/* 소리 켜기(자동 재생이 소리 없이 시작됐을 때) */
+.unmute{position:absolute;left:50%;top:clamp(10px,4%,24px);transform:translateX(-50%);z-index:4;display:none;align-items:center;gap:8px;
+  background:var(--ink);color:#fff;border:0;font:inherit;font-weight:700;font-size:clamp(14px,1.8vw,17px);padding:10px 18px;border-radius:999px;cursor:pointer;
+  box-shadow:0 10px 24px -8px rgba(22,24,29,.55);animation:pulse2 1.6s ease-out infinite}
+.unmute.on{display:inline-flex}
+@keyframes pulse2{0%{box-shadow:0 0 0 0 rgba(242,90,43,.5)}100%{box-shadow:0 0 0 14px rgba(242,90,43,0)}}
 /* 영상 속 '지금 테스트하기' 자리에 겹치는 진짜 버튼 */
 .hot{
   position:absolute;left:7.6%;top:71.7%;width:29.4%;height:10.8%;
@@ -112,14 +132,19 @@ video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;backgr
 <body>
 <main class="wrap">
   <p class="eyebrow">WOW Together · Teaser</p>
-  <div class="stage" id="stage">
-    <video id="v" src="teaser.mp4" poster="poster.jpg" preload="metadata" playsinline webkit-playsinline></video>
+  <div class="stage counting" id="stage">
+    <video id="v" src="teaser.mp4" poster="poster.jpg" preload="auto" playsinline webkit-playsinline></video>
     <button class="play" id="play" aria-label="티저 영상 재생 (소리 켜짐)">
       <i><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12.5-7.5a1 1 0 0 0 0-1.72L8.5 3.64A1 1 0 0 0 7 4.5z"/></svg></i>
     </button>
+    <div class="cd" id="cd" role="status" aria-live="polite">
+      <div class="ring"><svg viewBox="0 0 100 100" aria-hidden="true"><circle class="bg" cx="50" cy="50" r="46"/><circle class="fg" cx="50" cy="50" r="46"/></svg><b id="cdn">3</b></div>
+      <small>잠시 후 시작합니다 · 화면을 누르면 바로 시작</small>
+    </div>
+    <button class="unmute" id="unmute" type="button">🔊 눌러서 소리 켜기</button>
     <a class="hot" id="hot" href="https://kuhedu.github.io/wowtype/" aria-label="WOW 타입 테스트 하기"></a>
   </div>
-  <div class="bar" id="bar">
+  <div class="bar counting" id="bar">
     <button class="start" id="play2" type="button"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12.5-7.5a1 1 0 0 0 0-1.72L8.5 3.64A1 1 0 0 0 7 4.5z"/></svg>티저 보기 · 35초</button>
     <a class="go" id="go" href="https://kuhedu.github.io/wowtype/"><span><span class="long">나는 어떤 </span><b>WOW</b> 타입 테스트 하기</span>
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
@@ -132,11 +157,31 @@ video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;backgr
 (function(){
   var v=document.getElementById('v'), stage=document.getElementById('stage'),
       bar=document.getElementById('bar'), note=document.getElementById('note');
+  var cd=document.getElementById('cd'), cdn=document.getElementById('cdn'), um=document.getElementById('unmute'), timer=null;
+  function stopCount(){ clearInterval(timer); timer=null; cd.classList.add('off'); bar.classList.remove('counting'); stage.classList.remove('counting'); }
   function start(){
+    stopCount();
     stage.classList.add('started'); bar.classList.add('started'); stage.classList.remove('ended'); bar.classList.remove('ended-ui');
-    v.controls=true; v.muted=false;
-    var p=v.play(); if(p&&p.catch) p.catch(function(){ v.muted=true; v.play(); note.textContent='소리가 꺼져 있으면 화면의 스피커 버튼을 눌러 주세요'; });
+    v.controls=true; v.muted=false; um.classList.remove('on');
+    var p=v.play();
+    if(p&&p.catch) p.catch(function(){
+      // 브라우저가 소리 있는 자동 재생을 막으면: 소리 없이 재생 + '소리 켜기' 버튼
+      v.muted=true;
+      v.play().then(function(){ um.classList.add('on'); }).catch(function(){
+        // 소리 없는 재생도 막히면(저전력 모드 등): 재생 버튼으로 되돌림
+        stage.classList.remove('started'); bar.classList.remove('started'); v.controls=false;
+      });
+    });
   }
+  um.addEventListener('click',function(){ v.muted=false; um.classList.remove('on'); if(v.paused) v.play(); });
+  v.addEventListener('volumechange',function(){ if(!v.muted) um.classList.remove('on'); });
+  // 열자마자 3초 카운트다운 → 재생 (화면 누르면 바로 시작 — 누른 경우엔 소리도 확실히 켜짐)
+  var n=3;
+  timer=setInterval(function(){
+    n--; if(n<=0){ start(); return; }
+    cdn.textContent=n; cdn.classList.remove('pop'); void cdn.offsetWidth; cdn.classList.add('pop');
+  },1000);
+  cd.addEventListener('click',start);
   document.getElementById('play').addEventListener('click',start);
   document.getElementById('play2').addEventListener('click',start);
   document.getElementById('again').addEventListener('click',function(){ v.currentTime=0; start(); });
