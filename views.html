@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>WOW 조회수</title><meta name="robots" content="noindex,nofollow">
+<style>
+:root{--bg:#f6f7f9;--card:#fff;--ink:#14171c;--sub:#6b7280;--line:#e5e7eb;--a:#1e5bd8;--b:#d9480f}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif}
+main{max-width:860px;margin:0 auto;padding:28px 16px 60px}
+h1{font-size:24px;margin:0 0 4px}.at{color:var(--sub);font-size:13px;margin:0 0 22px}
+.grid{display:grid;grid-template-columns:1fr 1fr;grid-gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px}
+.card h2{font-size:15px;margin:0 0 2px}.card a{color:var(--sub);font-size:12px;text-decoration:none;word-break:break-all}
+.nums{display:flex;margin-top:14px}.nums div{flex:1}.nums b{display:block;font-size:34px;letter-spacing:-.5px}
+.nums span{font-size:12px;color:var(--sub)}.today{margin-top:10px;font-size:13px;color:var(--sub)}.today b{color:var(--ink)}
+h3{font-size:15px;margin:28px 0 10px}
+table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;font-size:14px}
+th,td{padding:9px 12px;border-bottom:1px solid var(--line);text-align:right}th:first-child,td:first-child{text-align:left}
+th{font-size:12px;color:var(--sub);font-weight:600;background:#fafbfc}tr:last-child td{border-bottom:0}
+.bar{display:inline-block;height:8px;border-radius:4px;vertical-align:middle;margin-left:6px}
+.note{color:var(--sub);font-size:12px;line-height:1.6;margin-top:18px}.err{color:#b42318}
+@media(max-width:560px){.grid{grid-template-columns:1fr}.nums b{font-size:28px}th,td{padding:8px 6px}}
+</style></head><body><main>
+<h1>WOW 페이지 조회수</h1><p class="at" id="at">불러오는 중…</p>
+<div class="grid">
+ <div class="card"><h2>전 직원 공표 페이지</h2><a href="https://kuhedu.github.io/wow/">kuhedu.github.io/wow/</a>
+  <div class="nums"><div><b id="wv">–</b><span>조회수</span></div><div><b id="wd">–</b><span>방문 기기 수</span></div></div>
+  <div class="today">오늘 조회 <b id="wtv">–</b> · 오늘 방문 기기 <b id="wtd">–</b></div></div>
+ <div class="card"><h2>티저 페이지</h2><a href="https://kuhedu.github.io/wowtype/teaser/">kuhedu.github.io/wowtype/teaser/</a>
+  <div class="nums"><div><b id="tv">–</b><span>조회수</span></div><div><b id="td">–</b><span>방문 기기 수</span></div></div>
+  <div class="today">오늘 조회 <b id="ttv">–</b> · 오늘 방문 기기 <b id="ttd">–</b></div></div>
+</div>
+<h3>날짜별</h3>
+<table><thead><tr><th>날짜</th><th>공표 조회</th><th>공표 기기</th><th>티저 조회</th><th>티저 기기</th></tr></thead><tbody id="rows"><tr><td colspan="5">–</td></tr></tbody></table>
+<p class="note">조회수 = 페이지가 열린 횟수(새로고침·다시 열기 포함, 그룹웨어 게시판 안에서 연 것도 셈) · 방문 기기 수 = 처음 연 기기(브라우저) 수. 같은 사람이 휴대폰·PC로 보면 2로 셉니다.<br>이름·IP·기기 정보는 모으지 않습니다. 1분마다 새로 고침(서버 집계도 1분 간격).</p>
+</main>
+<script>
+var URL='https://script.google.com/macros/s/AKfycbynBmPNfy0UrfTy0xv-Iz3QeeZVytw1_0eW6euOEhvg6Nad6VpOxnqNqwiq-cc54xckXg/exec';
+function $(i){return document.getElementById(i)}
+function n(x){return (x||0).toLocaleString('ko-KR')}
+function load(){
+ fetch(URL+'?views&_='+Date.now()).then(function(r){return r.json()}).then(function(o){
+  if(!o.ok)throw 0;var P=o.pages,D=o.days||{},day=new Date(Date.now()+324e5).toISOString().slice(0,10),T=D[day]||{};
+  $('wv').textContent=n(P.wow.views);$('wd').textContent=n(P.wow.devices);$('tv').textContent=n(P.teaser.views);$('td').textContent=n(P.teaser.devices);
+  function g(p,k){return T[p]?T[p][k]:0}
+  $('wtv').textContent=n(g('wow','views'));$('wtd').textContent=n(g('wow','devices'));$('ttv').textContent=n(g('teaser','views'));$('ttd').textContent=n(g('teaser','devices'));
+  var ks=Object.keys(D).sort().reverse(),mx=1;ks.forEach(function(k){['wow','teaser'].forEach(function(p){if(D[k][p])mx=Math.max(mx,D[k][p].views)})});
+  function c(k,p,f){var r=D[k][p];if(!r)return '<td>0</td>';var v=r[f];return '<td>'+n(v)+(f==='views'?'<span class="bar" style="width:'+Math.round(60*v/mx)+'px;background:'+(p==='wow'?'var(--a)':'var(--b)')+'"></span>':'')+'</td>'}
+  $('rows').innerHTML=ks.length?ks.map(function(k){return '<tr><td>'+k.slice(5).replace('-','/')+'</td>'+c(k,'wow','views')+c(k,'wow','devices')+c(k,'teaser','views')+c(k,'teaser','devices')+'</tr>'}).join(''):'<tr><td colspan="5">아직 기록 없음</td></tr>';
+  $('at').textContent='기준 '+new Date(o.at).toLocaleString('ko-KR',{hour12:false});$('at').className='at';
+ }).catch(function(){$('at').textContent='불러오기 실패 — 잠시 뒤 다시 시도합니다';$('at').className='at err'});
+}
+load();setInterval(load,60000);
+</script></body></html>
