@@ -221,6 +221,12 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
 .bonus.on{display:block}
 .bonus b{display:inline-block;margin-right:6px;padding:2px 8px;border-radius:999px;background:var(--p);color:#fff;font-size:11px;font-weight:800}
 .acts{display:flex;flex-direction:column;gap:10px;margin-top:22px}
+.peer{margin-top:26px;padding:20px 18px 18px;border-radius:24px;background:linear-gradient(135deg,rgba(255,255,255,.92),rgba(255,255,255,.7));border:1px solid var(--line);text-align:center}
+.peer h3{margin:0;font-size:19px;font-weight:800;letter-spacing:-.03em;color:var(--ink);line-height:1.35}
+.peer p{margin:6px 0 14px;font-size:13.5px;color:var(--mute);line-height:1.5}
+.btn.share{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;background:linear-gradient(100deg,#E8457A,#F2994A);box-shadow:0 10px 24px rgba(232,69,122,.28)}
+.btn.share svg{width:21px;height:21px}
+.btn.share.done{background:#1f9d6b;box-shadow:0 10px 24px rgba(31,157,107,.25)}
 .fine{margin:18px 0 6px;font-size:12px;color:var(--mute);text-align:center;line-height:1.6}
 
 /* ---------- 12.1 티저 배너 ---------- */
@@ -357,6 +363,11 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
         <div id="tzCd"></div>
       </div>
     </div></div>
+    <div class="peer">
+      <h3>옆자리 동료는 어떤 WOW 타입일까요?</h3>
+      <p>링크를 보내 함께 해 보세요. 9문항, 2분이면 끝나요</p>
+      <button class="btn share" id="peerShare"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg><span>동료에게 테스트 권하기</span></button>
+    </div>
     <div class="acts">
       <button class="btn" id="again">처음부터 다시 하기</button>
     </div>
@@ -776,6 +787,31 @@ $('start').onclick = () => { reset(); show('quiz'); renderQ(); arm(); };
 $('opts').addEventListener('click', e => { const b = e.target.closest('.opt'); if (b) pick(+b.dataset.n, b); });
 $('back').onclick = () => { if (busy) return; stepBack(); };
 $('next').onclick = () => { if (busy || answers[cur] == null) return; if (cur < flow.length - 1) { cur++; renderQ(true); } else finish(); };
+// 동료에게 권하기: 공유 창 → 안 되면 문구+링크 복사
+(function () {
+  const URL_T = 'https://kuhedu.github.io/wowtype/';
+  const b = $('peerShare'), lab = b.querySelector('span'), LAB = lab.textContent;
+  function msg() {
+    const nk = LAST_R && NICK[LAST_R.code] ? NICK[LAST_R.code].name : '';
+    return (nk ? '나는 ‘' + nk + '’ 타입이래요! ' : '') + '당신은 어떤 WOW 타입일까요? 9문항, 2분이면 끝나요 👉';
+  }
+  function copyOld(t) {
+    const ta = document.createElement('textarea'); ta.value = t; ta.setAttribute('readonly', '');
+    ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0'; document.body.appendChild(ta); ta.select();
+    let ok = false; try { ok = document.execCommand('copy'); } catch (e) {} ta.remove(); return ok;
+  }
+  function copied(ok) {
+    lab.textContent = ok ? '링크를 복사했어요 · 카톡에 붙여넣기' : '복사가 안 되면 주소를 길게 눌러 복사하세요';
+    if (!ok) lab.textContent += ' ' + URL_T;
+    b.classList.add('done'); clearTimeout(b._t); b._t = setTimeout(() => { lab.textContent = LAB; b.classList.remove('done'); }, 3500);
+  }
+  b.onclick = () => {
+    const text = msg(), all = text + ' ' + URL_T;
+    if (navigator.share) { navigator.share({ title: '나는 어떤 WOW 타입일까?', text: text, url: URL_T }).catch(e => { if (e && e.name !== 'AbortError') copied(copyOld(all)); }); return; }
+    if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(all).then(() => copied(true), () => copied(copyOld(all)));
+    else copied(copyOld(all));
+  };
+})();
 $('again').onclick = () => { reset(); setWay(''); show('intro'); };
 window.addEventListener('popstate', () => {
   armed = false;
